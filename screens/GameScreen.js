@@ -24,9 +24,6 @@ const GameScreen = props => {
   const currentHigh = useRef(100);
 
   const nextGuessHandler = direction => {
-    //   console.log(direction)
-    //   console.log(props.userChoice)
-    //   console.log(currentGuess)
     if (
       (direction === 'lower' && currentGuess < props.userChoice) ||
       (direction === 'greater' && currentGuess > props.userChoice)
@@ -43,7 +40,11 @@ const GameScreen = props => {
       currentLow.current = currentGuess;
     }
 
-    const nextNumber = generateRandomBetween(currentLow, currentHigh, currentGuess);
+    const nextNumber = generateRandomBetween(
+      currentLow.current,
+      currentHigh.current,
+      currentGuess
+    );
     setCurrentGuess(nextNumber);
   };
 

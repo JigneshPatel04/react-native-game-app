@@ -4,8 +4,7 @@ import { View, Text, StyleSheet } from 'react-native';
 import Colors from '../constants/colors';
 
 const NumberContainer = props => {
-  console.log('props.children',props.children)
-  
+   
   return (
     <View style={styles.container}>
       <Text style={styles.number}>{props.children}</Text>
