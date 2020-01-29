@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { StyleSheet, Text, View } from 'react-native';
+import { StyleSheet, Text, View, SafeAreaView } from 'react-native';
 
 import * as Font from 'expo-font';
 import { AppLoading } from 'expo';
@@ -9,6 +9,7 @@ import StartGameScreen from './screens/StartGameScreen';
 import GameScreen from './screens/GameScreen';
 import GameOverScreen from './screens/GameOverScreen';
 import MainScreen from './screens/MainScreen';
+import Login from './screens/Login';
 
 const fetchFonts = () => {
   return Font.loadAsync({
@@ -63,12 +64,12 @@ export default function App() {
   }
 
   return (
-    <View style={styles.screen}>
-      <Header title='Guess a Number' />
-      {content}
-      {/* <StartGameScreen />
+    <SafeAreaView style={styles.screen}>
+         <Header title='Guess a Number' />
+        {content}
+        {/* <StartGameScreen />
       <GameScreen /> */}
-    </View>
+    </SafeAreaView>
   );
 }
 
