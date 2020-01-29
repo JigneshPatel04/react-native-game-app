@@ -14,6 +14,7 @@ import Card from '../components/Card';
 import MainButton from '../components/MainButton';
 import BodyText from '../components/BodyText';
 import DefaultStyles from '../constants/default-styles';
+import { ScreenOrientation } from 'expo';
 
 const generateRandomBetween = (min, max, exclude) => {
   min = Math.ceil(min);
@@ -34,15 +35,33 @@ const renderListItem = (listLength, itemData) => (
 );
 
 const GameScreen = props => {
+  // ScreenOrientation.lockAsync(ScreenOrientation.OrientationLock.PORTRAIT);
   const initialGuess = generateRandomBetween(1, 100, props.userChoice);
 
   const [currentGuess, setCurrentGuess] = useState(initialGuess);
   const [pastGuesses, setPastGuesses] = useState([initialGuess.toString()]);
+  const [availableDeviceWidth, setAvailableDeviceWidth] = useState(
+    Dimensions.get('window').width
+  );
+  const [availableDeviceHeight, setAvailableDeviceHeight] = useState(
+    Dimensions.get('window').height
+  );
 
   const currentLow = useRef(1);
   const currentHigh = useRef(100);
 
   const { userChoice, onGameOver } = props;
+
+  useEffect(() => {
+    const updateLayout = () => {
+      setAvailableDeviceWidth(Dimensions.get('window').width);
+      setAvailableDeviceHeight(Dimensions.get('window').height);
+    };
+    Dimensions.addEventListener('change', updateLayout);
+    return () => {
+      Dimensions.removeEventListener('change', updateLayout);
+    };
+  });
 
   useEffect(() => {
     if (currentGuess === userChoice) {
@@ -81,37 +100,46 @@ const GameScreen = props => {
   };
 
   let listContainerStyle = styles.listContainer;
+
+  if (availableDeviceWidth < 350) {
+    listContainerStyle = styles.listContainerBig;
+  }
+
   if (Dimensions.get('window').width < 350) {
     listContainerStyle = styles.listContainerBig;
   }
 
-  return (
-    <View style={styles.screen}>
-      <Text style={DefaultStyles.title}>Opponent's Guess</Text>
-      <NumberContainer>{currentGuess}</NumberContainer>
-      <Card style={styles.buttonContainer}>
-        <MainButton onPress={nextGuessHandler.bind(this, 'lower')}>
-          <Ionicons name='md-remove' size={24} color='white' />
-        </MainButton>
-        <MainButton onPress={nextGuessHandler.bind(this, 'greater')}>
-          <Ionicons name='md-add' size={24} color='white' />
-        </MainButton>
-      </Card>
-      <View style={listContainerStyle}>
-        {/* <ScrollView contentContainerStyle={styles.list}>
+  if (availableDeviceHeight < 500) {
+    return (
+      <View style={styles.screen}>
+        <Text style={DefaultStyles.title}>Opponent's Guess</Text>
+        <NumberContainer>{currentGuess}</NumberContainer>
+        <Card style={styles.buttonContainer}>
+          <View style={styles.controls}>
+            <MainButton onPress={nextGuessHandler.bind(this, 'lower')}>
+              <Ionicons name='md-remove' size={24} color='white' />
+            </MainButton>
+            <MainButton onPress={nextGuessHandler.bind(this, 'greater')}>
+              <Ionicons name='md-add' size={24} color='white' />
+            </MainButton>
+          </View>
+        </Card>
+        <View style={listContainerStyle}>
+          {/* <ScrollView contentContainerStyle={styles.list}>
           {pastGuesses.map((guess, index) =>
             renderListItem(guess, pastGuesses.length - index)
           )}
         </ScrollView> */}
-        <FlatList
-          keyExtractor={item => item}
-          data={pastGuesses}
-          renderItem={renderListItem.bind(this, pastGuesses.length)}
-          contentContainerStyle={styles.list}
-        />
+          <FlatList
+            keyExtractor={item => item}
+            data={pastGuesses}
+            renderItem={renderListItem.bind(this, pastGuesses.length)}
+            contentContainerStyle={styles.list}
+          />
+        </View>
       </View>
-    </View>
-  );
+    );
+  }
 };
 
 const styles = StyleSheet.create({
@@ -134,6 +162,12 @@ const styles = StyleSheet.create({
   },
   listContainerBig: {
     flex: 1,
+    width: '80%'
+  },
+  controls: {
+    flexDirection: 'row',
+    justifyContent: 'space-around',
+    alignItems: 'center',
     width: '80%'
   },
   list: {
